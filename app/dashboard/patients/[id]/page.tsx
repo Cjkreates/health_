@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useState } from 'react';
-import { ArrowLeft, Heart, Activity, Droplet, Weight, FileText, Check } from 'lucide-react';
+import { ArrowLeft, Heart, Activity, Droplet, Weight, FileText, Check, Eye } from 'lucide-react';
 import Link from 'next/link';
 
 interface PatientProfileProps {
@@ -11,6 +11,15 @@ interface PatientProfileProps {
 }
 
 interface SOAPNote {
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
+}
+
+interface PastNote {
+  id: string;
+  date: string;
   subjective: string;
   objective: string;
   assessment: string;
@@ -105,6 +114,34 @@ export default function PatientProfilePage({ params }: PatientProfileProps) {
       color: 'text-orange-500',
       bgColor: 'bg-orange-100',
       status: 'Normal',
+    },
+  ];
+
+  // Mock past SOAP notes
+  const pastNotes: PastNote[] = [
+    {
+      id: '1',
+      date: 'Oct 12, 2024',
+      subjective: 'Patient reports recurring lower back pain, especially after standing for prolonged periods.',
+      objective: 'Mild muscle tension noted on palpation. No neurological deficits observed.',
+      assessment: 'Chronic lower back pain - likely mechanical origin.',
+      plan: 'Physical therapy referral, NSAIDs as needed, ergonomic assessment.',
+    },
+    {
+      id: '2',
+      date: 'Sep 18, 2024',
+      subjective: 'Patient complains of persistent headaches for the past week. States they are worse with stress.',
+      objective: 'Blood pressure normal. No focal neurological findings. MRI ordered.',
+      assessment: 'Tension headaches with possible migraine component.',
+      plan: 'Preventive medication prescribed. Stress management counseling recommended.',
+    },
+    {
+      id: '3',
+      date: 'Aug 22, 2024',
+      subjective: 'Follow-up visit for hypertension management. Patient reports good medication compliance.',
+      objective: 'Blood pressure 118/76 mmHg. ECG normal. Lipid panel within normal limits.',
+      assessment: 'Hypertension well-controlled on current medication regimen.',
+      plan: 'Continue current antihypertensive therapy. Repeat labs in 3 months.',
     },
   ];
 
@@ -383,6 +420,30 @@ export default function PatientProfilePage({ params }: PatientProfileProps) {
                 <Check className="w-5 h-5" />
                 Save Note
               </button>
+            </div>
+
+            {/* History Section */}
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Past Notes</h3>
+              <div className="space-y-4">
+                {pastNotes.map((note) => (
+                  <div
+                    key={note.id}
+                    className="p-6 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600 font-medium mb-2">{note.date}</p>
+                        <p className="text-gray-900 font-semibold line-clamp-2">{note.assessment}</p>
+                      </div>
+                      <button className="ml-4 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium flex items-center gap-2 transition-colors whitespace-nowrap">
+                        <Eye className="w-4 h-4" />
+                        View Full
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
