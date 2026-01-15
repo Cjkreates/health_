@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Heart, Stethoscope, Calendar, FileText } from 'lucide-react';
 
 export default function Home() {
@@ -10,9 +11,11 @@ export default function Home() {
           <Heart className="w-8 h-8 text-blue-500" />
           <span className="text-2xl font-bold text-blue-600">HealthOS</span>
         </div>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
-          Login
-        </button>
+        <Link href="/login">
+          <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+            Login
+          </button>
+        </Link>
       </nav>
 
       {/* Hero Section */}

@@ -13,6 +13,13 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form
+    if (!email || !password) {
+      alert('Please fill in all fields');
+      return;
+    }
+
     setIsLoading(true);
     
     // Simulate login request (mock login)
@@ -20,7 +27,7 @@ export default function LoginPage() {
       setIsLoading(false);
       // Mock login successful - navigate to dashboard
       router.push('/dashboard');
-    }, 1000);
+    }, 500);
   };
 
   return (
