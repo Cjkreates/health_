@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Users, Calendar, FileText, DollarSign, ArrowUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -165,9 +166,11 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
           <div className="space-y-3">
-            <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition-colors">
-              Schedule Appointment
-            </button>
+            <Link href="/dashboard/appointments" className="w-full block">
+              <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition-colors">
+                Schedule Appointment
+              </button>
+            </Link>
             <button className="w-full border-2 border-blue-500 text-blue-500 hover:bg-blue-50 font-semibold py-3 rounded-lg transition-colors">
               Add Patient
             </button>
