@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Users, Calendar, FileText, DollarSign, ArrowUp } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function DashboardPage() {
   const stats = [
@@ -39,6 +40,17 @@ export default function DashboardPage() {
     },
   ];
 
+  // Mock data for patient visits over the last 7 days
+  const patientVisitsData = [
+    { day: 'Mon', visits: 45 },
+    { day: 'Tue', visits: 52 },
+    { day: 'Wed', visits: 48 },
+    { day: 'Thu', visits: 61 },
+    { day: 'Fri', visits: 55 },
+    { day: 'Sat', visits: 67 },
+    { day: 'Sun', visits: 58 },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -73,6 +85,46 @@ export default function DashboardPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* Patient Activity Chart */}
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Patient Activity</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart
+            data={patientVisitsData}
+            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis
+              dataKey="day"
+              stroke="#6b7280"
+              style={{ fontSize: '14px' }}
+            />
+            <YAxis
+              stroke="#6b7280"
+              style={{ fontSize: '14px' }}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              }}
+              labelStyle={{ color: '#111827', fontWeight: 600 }}
+              cursor={{ stroke: '#3b82f6', strokeWidth: 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="visits"
+              stroke="#3b82f6"
+              strokeWidth={3}
+              dot={{ fill: '#3b82f6', r: 6 }}
+              activeDot={{ r: 8 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Additional Content Section */}
