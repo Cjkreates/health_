@@ -1,21 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Heart, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login request
+    
+    // Simulate login request (mock login)
     setTimeout(() => {
       setIsLoading(false);
-      console.log('Login attempt:', { email, password });
+      // Mock login successful - navigate to dashboard
+      router.push('/dashboard');
     }, 1000);
   };
 
@@ -38,7 +42,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-5">
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
@@ -126,7 +130,7 @@ export default function LoginPage() {
 
         {/* Additional info */}
         <p className="text-center text-xs text-gray-500 mt-6">
-          © 2026 HealthOS. Your secure healthcare management system.
+          © 2026 HealthOS. Your secure healthcare management _system_.
         </p>
       </div>
     </div>
