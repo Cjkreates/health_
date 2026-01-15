@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, Plus, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 
 interface Patient {
@@ -13,6 +14,7 @@ interface Patient {
 }
 
 export default function PatientsPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Mock patient data
@@ -120,6 +122,11 @@ export default function PatientsPage() {
     }
   };
 
+  // Handle row click - navigate to patient detail page
+  const handleRowClick = (patientId: string) => {
+    router.push(`/dashboard/patients/${patientId}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -172,7 +179,8 @@ export default function PatientsPage() {
                   return (
                     <tr
                       key={patient.id}
-                      className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                      onClick={() => handleRowClick(patient.id)}
+                      className="border-b border-gray-200 hover:bg-blue-50 transition-colors cursor-pointer"
                     >
                       <td className="px-6 py-4 text-sm text-gray-900 font-medium">{patient.id}</td>
                       <td className="px-6 py-4 text-sm text-gray-900 font-medium">{patient.name}</td>
@@ -188,7 +196,12 @@ export default function PatientsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <button className="text-blue-500 hover:text-blue-700 font-semibold text-sm transition-colors">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="text-blue-500 hover:text-blue-700 font-semibold text-sm transition-colors"
+                        >
                           View
                         </button>
                       </td>
