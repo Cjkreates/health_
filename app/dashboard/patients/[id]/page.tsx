@@ -1,7 +1,7 @@
 'use client';
 
-import React, { use } from 'react';
-import { ArrowLeft, Heart, Activity, Droplet, Weight } from 'lucide-react';
+import React, { use, useState } from 'react';
+import { ArrowLeft, Heart, Activity, Droplet, Weight, FileText, Check } from 'lucide-react';
 import Link from 'next/link';
 
 interface PatientProfileProps {
@@ -10,8 +10,23 @@ interface PatientProfileProps {
   }>;
 }
 
+interface SOAPNote {
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
+}
+
 export default function PatientProfilePage({ params }: PatientProfileProps) {
   const { id: patientId } = use(params);
+  const [activeTab, setActiveTab] = useState<'overview' | 'clinical-notes'>('overview');
+  const [soapNote, setSOAPNote] = useState<SOAPNote>({
+    subjective: '',
+    objective: '',
+    assessment: '',
+    plan: '',
+  });
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
 
   // Mock patient data - in a real app, this would be fetched based on ID
   const patient = {
@@ -92,6 +107,19 @@ export default function PatientProfilePage({ params }: PatientProfileProps) {
       status: 'Normal',
     },
   ];
+
+  const handleSOAPChange = (field: keyof SOAPNote, value: string) => {
+    setSOAPNote((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSaveNote = () => {
+    console.log('SOAP Note Saved:', soapNote);
+    setShowSaveAlert(true);
+    setTimeout(() => setShowSaveAlert(false), 3000);
+  };
 
   return (
     <div className="space-y-6">
@@ -206,6 +234,158 @@ export default function PatientProfilePage({ params }: PatientProfileProps) {
             })}
           </div>
         </div>
+      </div>
+
+      {/* Medical Notes Section */}
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+        {/* Tabs */}
+        <div className="flex gap-4 mb-6 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`pb-4 px-2 font-semibold transition-colors ${
+              activeTab === 'overview'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('clinical-notes')}
+            className={`pb-4 px-2 font-semibold transition-colors flex items-center gap-2 ${
+              activeTab === 'clinical-notes'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            Clinical Notes (SOAP)
+          </button>
+        </div>
+
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Patient Overview</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-600 text-sm">Age</p>
+                <p className="text-2xl font-bold text-gray-900">{patient.age}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-600 text-sm">Blood Type</p>
+                <p className="text-2xl font-bold text-gray-900">{patient.bloodType}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-600 text-sm">Gender</p>
+                <p className="text-2xl font-bold text-gray-900">{patient.gender}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Clinical Notes Tab */}
+        {activeTab === 'clinical-notes' && (
+          <div>
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">SOAP Note</h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Document patient encounter using the SOAP framework
+              </p>
+            </div>
+
+            {/* Save Alert */}
+            {showSaveAlert && (
+              <div className="mb-6 p-4 bg-green-100 border border-green-300 rounded-lg flex items-center gap-3">
+                <Check className="w-5 h-5 text-green-600" />
+                <span className="text-green-800 font-medium">Saved Successfully</span>
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {/* Subjective */}
+              <div>
+                <label htmlFor="subjective" className="block text-sm font-semibold text-gray-900 mb-2">
+                  Subjective
+                </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Patient's description of symptoms and history
+                </p>
+                <textarea
+                  id="subjective"
+                  value={soapNote.subjective}
+                  onChange={(e) => handleSOAPChange('subjective', e.target.value)}
+                  placeholder="e.g., Patient reports experiencing mild headaches for the past 2 days..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                  rows={4}
+                />
+              </div>
+
+              {/* Objective */}
+              <div>
+                <label htmlFor="objective" className="block text-sm font-semibold text-gray-900 mb-2">
+                  Objective
+                </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Clinical observations and test results
+                </p>
+                <textarea
+                  id="objective"
+                  value={soapNote.objective}
+                  onChange={(e) => handleSOAPChange('objective', e.target.value)}
+                  placeholder="e.g., Blood pressure 120/80 mmHg, Heart rate 72 bpm, Temperature 98.6°F..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                  rows={4}
+                />
+              </div>
+
+              {/* Assessment */}
+              <div>
+                <label htmlFor="assessment" className="block text-sm font-semibold text-gray-900 mb-2">
+                  Assessment
+                </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Clinical impressions and diagnoses
+                </p>
+                <textarea
+                  id="assessment"
+                  value={soapNote.assessment}
+                  onChange={(e) => handleSOAPChange('assessment', e.target.value)}
+                  placeholder="e.g., Tension-type headache, likely caused by stress and poor sleep..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                  rows={4}
+                />
+              </div>
+
+              {/* Plan */}
+              <div>
+                <label htmlFor="plan" className="block text-sm font-semibold text-gray-900 mb-2">
+                  Plan
+                </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Treatment plan and follow-up recommendations
+                </p>
+                <textarea
+                  id="plan"
+                  value={soapNote.plan}
+                  onChange={(e) => handleSOAPChange('plan', e.target.value)}
+                  placeholder="e.g., Prescribe ibuprofen 400mg every 6 hours, recommend rest and hydration, follow-up in 1 week if symptoms persist..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                  rows={4}
+                />
+              </div>
+
+              {/* Save Button */}
+              <button
+                onClick={handleSaveNote}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <Check className="w-5 h-5" />
+                Save Note
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}
