@@ -1,17 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { use } from 'react';
 import { ArrowLeft, Heart, Activity, Droplet, Weight } from 'lucide-react';
 import Link from 'next/link';
 
 interface PatientProfileProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function PatientProfilePage({ params }: PatientProfileProps) {
-  const patientId = params.id;
+  const { id: patientId } = use(params);
 
   // Mock patient data - in a real app, this would be fetched based on ID
   const patient = {
