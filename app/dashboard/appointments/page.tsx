@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Plus, Clock, User } from 'lucide-react';
+import { Calendar, Plus, Clock, User, X } from 'lucide-react';
 
 interface Appointment {
   id: string;
@@ -15,6 +15,12 @@ interface UpcomingRequest {
   id: string;
   patientName: string;
   date: string;
+}
+
+interface NewAppointmentForm {
+  patientName: string;
+  time: string;
+  reason: string;
 }
 
 const mockAppointments: Appointment[] = [
@@ -82,6 +88,48 @@ const getTypeColor = (type: string) => {
 
 export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [appointments, setAppointments] = useState<Appointment[]>(mockAppointments);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState<NewAppointmentForm>({
+    patientName: '',
+    time: '',
+    reason: 'Check-up',
+  });
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({ patientName: '', time: '', reason: 'Check-up' });
+  };
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveAppointment = () => {
+    if (!formData.patientName || !formData.time) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const newAppointment: Appointment = {
+      id: String(appointments.length + 1),
+      time: formData.time,
+      patientName: formData.patientName,
+      type: (formData.reason as 'Check-up' | 'Surgery' | 'Follow-up') || 'Check-up',
+      status: 'Pending',
+    };
+
+    setAppointments((prev) => [...prev, newAppointment]);
+    handleCloseModal();
+  };
 
   return (
     <div className="flex h-full gap-6 p-8">
@@ -132,7 +180,9 @@ export default function AppointmentsPage() {
             <Clock className="w-5 h-5 text-blue-600" />
             <h2 className="text-lg font-semibold">Daily Schedule - Today</h2>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
+          <button 
+            onClick={handleOpenModal}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
             <Plus className="w-4 h-4" />
             New Appointment
           </button>
@@ -141,7 +191,7 @@ export default function AppointmentsPage() {
         {/* Time Slots */}
         <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
           {timeSlots.map((slot) => {
-            const appointment = mockAppointments.find((apt) => apt.time === slot);
+            const appointment = appointments.find((apt) => apt.time === slot);
 
             return (
               <div key={slot} className="flex gap-4">
@@ -175,6 +225,100 @@ export default function AppointmentsPage() {
           })}
         </div>
       </div>
+
+      {/* Modal Overlay */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900">New Appointment</h3>
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                aria-label="Close appointment modal"
+                className="text-gray-500 hover:text-gray-700 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              {/* Patient Name */}
+              <div>
+                <label htmlFor="patientName" className="block text-sm font-medium text-gray-700 mb-2">
+                  Patient Name
+                </label>
+                <input
+                  id="patientName"
+                  type="text"
+                  name="patientName"
+                  value={formData.patientName}
+                  onChange={handleFormChange}
+                  placeholder="Enter patient name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Time */}
+              <div>
+                <label htmlFor="appointmentTime" className="block text-sm font-medium text-gray-700 mb-2">
+                  Time
+                </label>
+                <select
+                  id="appointmentTime"
+                  name="time"
+                  value={formData.time}
+                  onChange={handleFormChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select a time</option>
+                  {timeSlots.map((slot) => (
+                    <option key={slot} value={slot}>
+                      {slot}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Reason (Type) */}
+              <div>
+                <label htmlFor="appointmentReason" className="block text-sm font-medium text-gray-700 mb-2">
+                  Reason
+                </label>
+                <select
+                  id="appointmentReason"
+                  name="reason"
+                  value={formData.reason}
+                  onChange={handleFormChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="Check-up">Check-up</option>
+                  <option value="Surgery">Surgery</option>
+                  <option value="Follow-up">Follow-up</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex gap-3 p-6 border-t border-gray-200">
+              <button
+                onClick={handleCloseModal}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveAppointment}
+                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
