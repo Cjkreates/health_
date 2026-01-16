@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Plus, Filter } from "lucide-react";
+import { Search, Plus, Filter, X } from "lucide-react";
+import { createPatient } from "./actions"; // Import our new server action
 
-// This defines what a "Patient" looks like in our app
+// Define the shape of our Patient data
 interface Patient {
   id: string;
   name: string;
@@ -18,19 +19,20 @@ interface Patient {
 export default function PatientClient({ initialPatients }: { initialPatients: Patient[] }) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for the modal
 
-  // This filters the list based on what you type
+  // Filter patients
   const filteredPatients = initialPatients.filter((patient) =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-slate-50 min-h-screen relative">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-slate-800">Patients</h1>
         <button 
           className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
-          onClick={() => alert("We will hook this up to Supabase next!")}
+          onClick={() => setIsModalOpen(true)} // Open the modal
         >
           <Plus size={20} />
           Add Patient
@@ -93,13 +95,80 @@ export default function PatientClient({ initialPatients }: { initialPatients: Pa
             ))}
           </tbody>
         </table>
-
-        {filteredPatients.length === 0 && (
-          <div className="p-8 text-center text-slate-500">
-            No patients found matching "{searchTerm}"
-          </div>
-        )}
       </div>
+
+      {/* --- ADD PATIENT MODAL --- */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">New Patient</h2>
+<button 
+  onClick={() => setIsModalOpen(false)} 
+  aria-label="Close modal" // <--- This fixes the error
+  className="p-1 hover:bg-slate-100 rounded-full transition"
+>
+  <X className="text-slate-400 hover:text-slate-600" />
+</button>
+            </div>
+            
+            <form action={async (formData) => {
+    await createPatient(formData);
+    setIsModalOpen(false);
+  }}>
+    <div className="space-y-3">
+      <input 
+        name="name" 
+        placeholder="Full Name" 
+        required 
+        aria-label="Full Name" 
+        className="w-full p-2 border rounded-lg" 
+      />
+      
+      <input 
+        name="age" 
+        type="number" 
+        placeholder="Age" 
+        required 
+        aria-label="Age"
+        className="w-full p-2 border rounded-lg" 
+      />
+      
+      <select 
+        name="gender" 
+        aria-label="Gender" 
+        className="w-full p-2 border rounded-lg"
+      >
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      
+      <input 
+        name="diagnosis" 
+        placeholder="Diagnosis (e.g., Flu)" 
+        required 
+        aria-label="Diagnosis"
+        className="w-full p-2 border rounded-lg" 
+      />
+      
+      <select 
+        name="status" 
+        aria-label="Patient Status" 
+        className="w-full p-2 border rounded-lg"
+      >
+        <option value="Stable">Stable</option>
+        <option value="Critical">Critical</option>
+        <option value="Recovering">Recovering</option>
+      </select>
+      
+      <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 mt-4">
+        Save Patient
+      </button>
+    </div>
+</form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
