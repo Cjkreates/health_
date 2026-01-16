@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import PatientClient from './client'; // We will create this next
+import PatientClient from './client';
+
+// 👇 This line fixes the Vercel build error
+export const dynamic = 'force-dynamic';
 
 const prisma = new PrismaClient();
 
